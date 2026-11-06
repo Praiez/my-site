@@ -1,19 +1,32 @@
-const escapeCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+const escapeCell = (value) => {
+  let text = String(value ?? "");
+  // Stops Excel and Google Sheets from running typed text as a formula.
+  if (/^[=+\-@\t\r]/.test(text)) text = `'${text}`;
+  return `"${text.replace(/"/g, '""')}"`;
+};
+
+// Phone numbers stay as text so Excel keeps every digit and any leading zero.
+const phoneCell = (value) => {
+  const text = String(value ?? "");
+  return /^\d{1,20}$/.test(text) ? `"=""${text}"""` : escapeCell(text);
+};
 
 export function buildCsv(rows) {
   const header = ["Full name", "Phone", "Marital status", "Birthday", "Occupation", "Address", "Submitted at"];
   const lines = rows.map((row) =>
     [
-      row.full_name,
-      row.phone,
-      row.marital_status,
-      row.birth_month && row.birth_day ? `${row.birth_day}/${row.birth_month}` : "",
-      row.occupation,
-      row.address,
-      row.submitted_at ? new Date(row.submitted_at).toLocaleString("en-GB", { timeZone: "Africa/Lagos" }) : "",
-    ]
-      .map(escapeCell)
-      .join(","),
+      escapeCell(row.full_name),
+      phoneCell(row.phone),
+      escapeCell(row.marital_status),
+      escapeCell(row.birth_month && row.birth_day ? `${row.birth_day} ${MONTHS[row.birth_month - 1]}` : ""),
+      escapeCell(row.occupation),
+      escapeCell(row.address),
+      escapeCell(
+        row.submitted_at ? new Date(row.submitted_at).toLocaleString("en-GB", { timeZone: "Africa/Lagos" }) : "",
+      ),
+    ].join(","),
   );
   return [header.map(escapeCell).join(","), ...lines].join("\r\n");
 }
