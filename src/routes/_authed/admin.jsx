@@ -11,7 +11,7 @@ import { buildCsv, downloadCsv } from "@/lib/csv";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { exportFirstTimers, firstTimerStats, listFirstTimers } from "@/lib/server-fns";
 
-export const Route = createFileRoute("/_authed/")({
+export const Route = createFileRoute("/_authed/admin")({
   head: () => ({ meta: [{ title: "First timers · RCCG DYC" }] }),
   component: Dashboard,
 });

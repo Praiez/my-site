@@ -18,11 +18,11 @@ export const Route = createFileRoute("/login")({
 // Only go back to a page on this same site, never to /login itself.
 function safeDestination(returnTo) {
   try {
-    const url = new URL(returnTo ?? "/", window.location.origin);
-    if (url.origin !== window.location.origin || url.pathname.startsWith("/login")) return "/";
+    const url = new URL(returnTo ?? "/admin", window.location.origin);
+    if (url.origin !== window.location.origin || url.pathname.startsWith("/login")) return "/admin";
     return url.pathname + url.search + url.hash;
   } catch {
-    return "/";
+    return "/admin";
   }
 }
 

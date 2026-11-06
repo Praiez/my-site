@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as WelcomeRouteImport } from './routes/welcome'
-import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AuthedAdminRouteImport } from './routes/_authed/admin'
 import { Route as AuthedQrRouteImport } from './routes/_authed/qr'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
@@ -29,9 +35,9 @@ const WelcomeRoute = WelcomeRouteImport.update({
   path: '/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedIndexRoute = AuthedIndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthedAdminRoute = AuthedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedQrRoute = AuthedQrRouteImport.update({
@@ -41,40 +47,45 @@ const AuthedQrRoute = AuthedQrRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthedIndexRoute
+  '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/welcome': typeof WelcomeRoute
+  '/admin': typeof AuthedAdminRoute
   '/qr': typeof AuthedQrRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/welcome': typeof WelcomeRoute
+  '/admin': typeof AuthedAdminRoute
   '/qr': typeof AuthedQrRoute
-  '/': typeof AuthedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
   '/welcome': typeof WelcomeRoute
+  '/_authed/admin': typeof AuthedAdminRoute
   '/_authed/qr': typeof AuthedQrRoute
-  '/_authed/': typeof AuthedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/welcome' | '/qr'
+  fullPaths: '/' | '/login' | '/welcome' | '/admin' | '/qr'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/welcome' | '/qr' | '/'
+  to: '/' | '/login' | '/welcome' | '/admin' | '/qr'
   id:
     | '__root__'
+    | '/'
     | '/_authed'
     | '/login'
     | '/welcome'
+    | '/_authed/admin'
     | '/_authed/qr'
-    | '/_authed/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
   LoginRoute: typeof LoginRoute
   WelcomeRoute: typeof WelcomeRoute
@@ -82,6 +93,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authed': {
       id: '/_authed'
       path: ''
@@ -103,11 +121,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WelcomeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/': {
-      id: '/_authed/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthedIndexRouteImport
+    '/_authed/admin': {
+      id: '/_authed/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthedAdminRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/qr': {
@@ -121,19 +139,20 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthedRouteChildren {
+  AuthedAdminRoute: typeof AuthedAdminRoute
   AuthedQrRoute: typeof AuthedQrRoute
-  AuthedIndexRoute: typeof AuthedIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedAdminRoute: AuthedAdminRoute,
   AuthedQrRoute: AuthedQrRoute,
-  AuthedIndexRoute: AuthedIndexRoute,
 }
 
 const AuthedRouteWithChildren =
   AuthedRoute._addFileChildren(AuthedRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   LoginRoute: LoginRoute,
   WelcomeRoute: WelcomeRoute,

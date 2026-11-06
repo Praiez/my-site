@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { ChurchMark } from "@/components/ChurchMark";
 
 const links = [
-  { to: "/", label: "First timers", icon: LayoutGrid },
+  { to: "/admin", label: "First timers", icon: LayoutGrid },
   { to: "/qr", label: "QR code", icon: QrCode },
 ];
 
@@ -16,7 +16,7 @@ export default function AppLayout({ children }) {
     <div className="min-h-screen bg-background">
       <header className="no-print sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-3 px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2.5">
+          <Link to="/admin" className="flex items-center gap-2.5">
             <ChurchMark className="h-9 w-9" />
             <span className="leading-tight">
               <span className="block font-heading text-[15px] font-semibold text-foreground">RCCG DYC</span>
