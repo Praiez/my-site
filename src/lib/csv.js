@@ -1,3 +1,5 @@
+import { statusLabel } from "@/lib/followUp";
+
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const escapeCell = (value) => {
@@ -13,6 +15,9 @@ const phoneCell = (value) => {
   return /^\+?\d{1,20}$/.test(text) ? `"=""${text}"""` : escapeCell(text);
 };
 
+const formatStamp = (value) =>
+  value ? new Date(value).toLocaleString("en-GB", { timeZone: "Africa/Lagos" }) : "";
+
 export function buildCsv(rows) {
   const header = [
     "Full name",
@@ -24,6 +29,9 @@ export function buildCsv(rows) {
     "Occupation",
     "Address",
     "Prayer request",
+    "Follow-up status",
+    "Follow-up notes",
+    "Last contacted",
     "Submitted at",
   ];
   const lines = rows.map((row) =>
@@ -37,9 +45,10 @@ export function buildCsv(rows) {
       escapeCell(row.occupation),
       escapeCell(row.address),
       escapeCell(row.prayer_request),
-      escapeCell(
-        row.submitted_at ? new Date(row.submitted_at).toLocaleString("en-GB", { timeZone: "Africa/Lagos" }) : "",
-      ),
+      escapeCell(statusLabel(row.follow_up_status)),
+      escapeCell(row.follow_up_notes),
+      escapeCell(formatStamp(row.last_contacted_at)),
+      escapeCell(formatStamp(row.submitted_at)),
     ].join(","),
   );
   return [header.map(escapeCell).join(","), ...lines].join("\r\n");

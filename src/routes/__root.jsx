@@ -10,11 +10,13 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "RCCG DYC · First Timer Welcome" },
+      { title: "Dominion Youth Centre · First Timer Welcome" },
       { name: "description", content: "Welcome home. Share a few details so we can stay in touch after your first visit." },
-      { name: "theme-color", content: "#fbf7f2" },
+      { name: "theme-color", content: "#1d4ed8" },
     ],
     links: [
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/logo.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

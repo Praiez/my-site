@@ -5,7 +5,9 @@ import { ShieldAlert } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import AdminToolbar from "@/components/admin/AdminToolbar";
+import BirthdaysThisMonth from "@/components/admin/BirthdaysThisMonth";
 import EntryList from "@/components/admin/EntryList";
+import FollowUpCards from "@/components/admin/FollowUpCards";
 import StatCards from "@/components/admin/StatCards";
 import { buildCsv, downloadCsv } from "@/lib/csv";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -21,6 +23,7 @@ function Dashboard() {
   const isAdmin = user?.role === "admin";
   const [search, setSearch] = useState("");
   const [marital, setMarital] = useState("all");
+  const [followUp, setFollowUp] = useState("all");
   const [exporting, setExporting] = useState(false);
   const debouncedSearch = useDebouncedValue(search);
 
@@ -28,16 +31,21 @@ function Dashboard() {
   const loadStats = useServerFn(firstTimerStats);
   const exportRows = useServerFn(exportFirstTimers);
 
-  const filters = { search: debouncedSearch, marital_status: marital === "all" ? "" : marital };
+  const filters = {
+    search: debouncedSearch,
+    marital_status: marital === "all" ? "" : marital,
+    follow_up_status: followUp === "all" ? "" : followUp,
+  };
   const entries = useQuery({
-    queryKey: ["first-timers", filters.search, filters.marital_status],
+    queryKey: ["first-timers", filters.search, filters.marital_status, filters.follow_up_status],
     queryFn: () => list({ data: { ...filters, limit: 200 } }),
     enabled: isAdmin,
     staleTime: 0,
   });
   const stats = useQuery({ queryKey: ["first-timer-stats"], queryFn: () => loadStats(), enabled: isAdmin, staleTime: 0 });
 
-  const isFiltering = filters.search.trim().length > 0 || filters.marital_status !== "";
+  const isFiltering =
+    filters.search.trim().length > 0 || filters.marital_status !== "" || filters.follow_up_status !== "";
 
   async function handleExport() {
     setExporting(true);
@@ -89,6 +97,10 @@ function Dashboard() {
 
       <StatCards stats={stats.data} loading={stats.isLoading} />
 
+      <FollowUpCards stats={stats.data} loading={stats.isLoading} onShowNew={() => setFollowUp("new")} />
+
+      <BirthdaysThisMonth />
+
       <div className="card-soft overflow-hidden">
         <div className="border-b border-border/70 p-4">
           <AdminToolbar
@@ -96,6 +108,8 @@ function Dashboard() {
             onSearch={setSearch}
             marital={marital}
             onMarital={setMarital}
+            followUp={followUp}
+            onFollowUp={setFollowUp}
             onExport={handleExport}
             exporting={exporting}
             total={stats.data?.total ?? 0}

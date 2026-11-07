@@ -1,4 +1,5 @@
 import { Briefcase, Cake, Heart, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import FollowUpPanel from "@/components/admin/FollowUpPanel";
 import { formatBirthday } from "@/lib/firstTimerOptions";
 import { telLink, whatsappLink } from "@/lib/phone";
 
@@ -101,6 +102,8 @@ export default function EntryRow({ entry }) {
               </a>
             </div>
           ) : null}
+
+          <FollowUpPanel entry={entry} />
         </div>
       </div>
     </li>

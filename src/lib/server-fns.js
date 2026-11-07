@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth-middleware";
 import { MARITAL_STATUSES } from "@/lib/firstTimerOptions";
+import { FOLLOW_UP_VALUES, NOTES_MAX_CHARS, OVERDUE_DAYS } from "@/lib/followUp";
 import { PRAYER_MAX_CHARS, SEX_OPTIONS } from "@/lib/formRules";
 import { createAnonClient } from "@/lib/supabase.server";
 
@@ -49,16 +50,17 @@ export const submitFirstTimer = createServerFn({ method: "POST" })
     return { id };
   });
 
-// Admin only: reviewing, searching, exporting.
+// Admin only: reviewing, searching, exporting, follow-up.
 const assertAdmin = (user) => {
   if (!user || user.role !== "admin") {
     throw Object.assign(new Error("This area is for church admins only."), { status: 403 });
   }
 };
 
-const applyFilters = (query, { search, marital_status }) => {
+const applyFilters = (query, { search, marital_status, follow_up_status }) => {
   let q = query;
   if (marital_status && marital_status !== "all") q = q.eq("marital_status", marital_status);
+  if (follow_up_status && follow_up_status !== "all") q = q.eq("follow_up_status", follow_up_status);
   const term = (search || "").replace(/[%_,()*"\\]/g, " ").trim();
   if (term) {
     const pattern = `%${term}%`;
@@ -70,6 +72,7 @@ const applyFilters = (query, { search, marital_status }) => {
 const FilterInput = z.object({
   search: z.string().max(80).optional().default(""),
   marital_status: z.string().max(40).optional().default(""),
+  follow_up_status: z.string().max(40).optional().default(""),
 });
 
 export const listFirstTimers = createServerFn({ method: "GET" })
@@ -119,6 +122,7 @@ export const firstTimerStats = createServerFn({ method: "GET" })
       Date.UTC(shifted.getUTCFullYear(), shifted.getUTCMonth(), shifted.getUTCDate()) - OFFSET,
     );
     const weekAgo = new Date(startOfToday.getTime() - 6 * 24 * 60 * 60 * 1000);
+    const overdueBefore = new Date(Date.now() - OVERDUE_DAYS * 24 * 60 * 60 * 1000);
 
     const count = async (since) => {
       let q = context.supabase.from("first_timers").select("id", { count: "exact", head: true });
@@ -128,6 +132,73 @@ export const firstTimerStats = createServerFn({ method: "GET" })
       return n ?? 0;
     };
 
-    const [total, today, week] = await Promise.all([count(null), count(startOfToday), count(weekAgo)]);
-    return { total, today, week };
+    const countNew = async (before) => {
+      let q = context.supabase
+        .from("first_timers")
+        .select("id", { count: "exact", head: true })
+        .eq("follow_up_status", "new");
+      if (before) q = q.lt("submitted_at", before.toISOString());
+      const { count: n, error } = await q;
+      if (error) throw new Error("Could not load stats.");
+      return n ?? 0;
+    };
+
+    const [total, today, week, still_new, overdue] = await Promise.all([
+      count(null),
+      count(startOfToday),
+      count(weekAgo),
+      countNew(null),
+      countNew(overdueBefore),
+    ]);
+    return { total, today, week, still_new, overdue };
+  });
+
+// Changing the status also stamps "last contacted" automatically.
+export const updateFollowUpStatus = createServerFn({ method: "POST" })
+  .middleware([requireUser])
+  .validator(z.object({ id: z.string().uuid(), follow_up_status: z.enum(FOLLOW_UP_VALUES) }))
+  .handler(async ({ data, context }) => {
+    assertAdmin(context.user);
+    const { data: updated, error } = await context.supabase
+      .from("first_timers")
+      .update({
+        follow_up_status: data.follow_up_status,
+        last_contacted_at: data.follow_up_status === "new" ? null : new Date().toISOString(),
+      })
+      .eq("id", data.id)
+      .select("id");
+    if (error || !updated?.length) throw new Error("Could not update this person.");
+    return { ok: true };
+  });
+
+export const updateFollowUpNotes = createServerFn({ method: "POST" })
+  .middleware([requireUser])
+  .validator(z.object({ id: z.string().uuid(), follow_up_notes: z.string().trim().max(NOTES_MAX_CHARS) }))
+  .handler(async ({ data, context }) => {
+    assertAdmin(context.user);
+    const { data: updated, error } = await context.supabase
+      .from("first_timers")
+      .update({ follow_up_notes: data.follow_up_notes || null })
+      .eq("id", data.id)
+      .select("id");
+    if (error || !updated?.length) throw new Error("Could not save the note.");
+    return { ok: true };
+  });
+
+export const birthdaysThisMonth = createServerFn({ method: "GET" })
+  .middleware([requireUser])
+  .handler(async ({ context }) => {
+    assertAdmin(context.user);
+    // Church local date (Africa/Lagos, UTC+1).
+    const local = new Date(Date.now() + 60 * 60 * 1000);
+    const month = local.getUTCMonth() + 1;
+    const { data: rows, error } = await context.supabase
+      .from("first_timers")
+      .select("id, full_name, phone, birth_month, birth_day")
+      .eq("birth_month", month)
+      .not("birth_day", "is", null)
+      .order("birth_day", { ascending: true })
+      .limit(200);
+    if (error) throw new Error("Could not load birthdays.");
+    return { month, today: local.getUTCDate(), items: rows };
   });
