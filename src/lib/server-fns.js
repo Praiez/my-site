@@ -156,7 +156,7 @@ export const firstTimerStats = createServerFn({ method: "GET" })
 // Changing the status also stamps "last contacted" automatically.
 export const updateFollowUpStatus = createServerFn({ method: "POST" })
   .middleware([requireUser])
-  .validator(z.object({ id: z.string().uuid(), follow_up_status: z.enum(FOLLOW_UP_VALUES) }))
+  .validator(z.object({ id: z.string().min(1).max(64), follow_up_status: z.enum(FOLLOW_UP_VALUES) }))
   .handler(async ({ data, context }) => {
     assertAdmin(context.user);
     const { data: updated, error } = await context.supabase
@@ -173,7 +173,7 @@ export const updateFollowUpStatus = createServerFn({ method: "POST" })
 
 export const updateFollowUpNotes = createServerFn({ method: "POST" })
   .middleware([requireUser])
-  .validator(z.object({ id: z.string().uuid(), follow_up_notes: z.string().trim().max(NOTES_MAX_CHARS) }))
+  .validator(z.object({ id: z.string().min(1).max(64), follow_up_notes: z.string().trim().max(NOTES_MAX_CHARS) }))
   .handler(async ({ data, context }) => {
     assertAdmin(context.user);
     const { data: updated, error } = await context.supabase
