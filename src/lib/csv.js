@@ -7,22 +7,36 @@ const escapeCell = (value) => {
   return `"${text.replace(/"/g, '""')}"`;
 };
 
-// Phone numbers stay as text so Excel keeps every digit and any leading zero.
+// Phone numbers stay as text so Excel keeps every digit, any leading zero and a leading +.
 const phoneCell = (value) => {
   const text = String(value ?? "");
-  return /^\d{1,20}$/.test(text) ? `"=""${text}"""` : escapeCell(text);
+  return /^\+?\d{1,20}$/.test(text) ? `"=""${text}"""` : escapeCell(text);
 };
 
 export function buildCsv(rows) {
-  const header = ["Full name", "Phone", "Marital status", "Birthday", "Occupation", "Address", "Submitted at"];
+  const header = [
+    "Full name",
+    "Phone",
+    "Email",
+    "Sex",
+    "Marital status",
+    "Birthday",
+    "Occupation",
+    "Address",
+    "Prayer request",
+    "Submitted at",
+  ];
   const lines = rows.map((row) =>
     [
       escapeCell(row.full_name),
       phoneCell(row.phone),
+      escapeCell(row.email),
+      escapeCell(row.sex),
       escapeCell(row.marital_status),
       escapeCell(row.birth_month && row.birth_day ? `${row.birth_day} ${MONTHS[row.birth_month - 1]}` : ""),
       escapeCell(row.occupation),
       escapeCell(row.address),
+      escapeCell(row.prayer_request),
       escapeCell(
         row.submitted_at ? new Date(row.submitted_at).toLocaleString("en-GB", { timeZone: "Africa/Lagos" }) : "",
       ),

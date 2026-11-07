@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth-middleware";
 import { MARITAL_STATUSES } from "@/lib/firstTimerOptions";
+import { PRAYER_MAX_CHARS, SEX_OPTIONS } from "@/lib/formRules";
 import { createAnonClient } from "@/lib/supabase.server";
 
 export const getServerInfo = createServerFn({ method: "GET" }).handler(async () => ({
@@ -11,12 +12,15 @@ export const getServerInfo = createServerFn({ method: "GET" }).handler(async () 
 // Public: a first-timer submits the welcome form (no account needed).
 const SubmissionInput = z.object({
   full_name: z.string().trim().min(2).max(120),
-  phone: z.string().trim().regex(/^\d{7,15}$/, "Enter a valid phone number"),
+  phone: z.string().trim().regex(/^\+?\d{7,15}$/, "Enter a valid phone number"),
+  email: z.string().trim().max(254).email("Enter a valid email address").or(z.literal("")).optional().default(""),
+  sex: z.enum(SEX_OPTIONS),
   address: z.string().trim().max(300).optional().default(""),
   occupation: z.string().trim().max(120).optional().default(""),
   marital_status: z.enum(MARITAL_STATUSES).optional().nullable(),
   birth_month: z.number().int().min(1).max(12).optional().nullable(),
   birth_day: z.number().int().min(1).max(31).optional().nullable(),
+  prayer_request: z.string().trim().max(PRAYER_MAX_CHARS).optional().default(""),
 });
 
 export const submitFirstTimer = createServerFn({ method: "POST" })
@@ -31,11 +35,14 @@ export const submitFirstTimer = createServerFn({ method: "POST" })
         id,
         full_name: data.full_name,
         phone: data.phone,
+        email: data.email || null,
+        sex: data.sex,
         address: data.address || null,
         occupation: data.occupation || null,
         marital_status: data.marital_status || null,
         birth_month: hasBirthday ? data.birth_month : null,
         birth_day: hasBirthday ? data.birth_day : null,
+        prayer_request: data.prayer_request || null,
         submitted_at: new Date().toISOString(),
       });
     if (error) throw new Error("Could not save your details.");

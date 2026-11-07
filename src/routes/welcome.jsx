@@ -8,7 +8,7 @@ import WelcomeForm from "@/components/welcome/WelcomeForm";
 export const Route = createFileRoute("/welcome")({
   head: () => ({
     meta: [
-      { title: "Welcome to RCCG DYC" },
+      { title: "Welcome to Dominion Youth Centre" },
       { name: "description", content: "First time with us? Share a few details and let us stay in touch." },
     ],
   }),
@@ -28,8 +28,10 @@ function WelcomePage() {
       <div className="mx-auto w-full max-w-xl animate-in fade-in slide-in-from-bottom-2 duration-500">
         <div className="no-print mb-6 flex flex-col items-center text-center">
           <ChurchMark className="h-14 w-14" />
-          <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.22em] text-primary/80">RCCG DYC</p>
-          <p className="text-sm text-muted-foreground">First Timer Connect</p>
+          <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.22em] text-primary/80">Dominion Youth Centre</p>
+          <p className="mt-1 max-w-xs text-sm italic text-muted-foreground">
+            a community of love, a place of restoration and empowerment
+          </p>
         </div>
 
         <div className="no-print mb-5 flex justify-center">
@@ -60,11 +62,13 @@ function WelcomePage() {
               <br className="hidden sm:block" /> you&rsquo;re here.
             </h1>
             <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-              Welcome to RCCG DYC! We&rsquo;re glad you&rsquo;re here. Please fill in your details so we can
-              reach out and walk with you.
+              Please take out time to fill this form. Thank you and God bless you.
             </p>
             <div className="my-6 h-px w-full bg-border/70" />
             <WelcomeForm />
+            <p className="mt-6 text-center text-sm italic text-muted-foreground">
+              It is our prayer that the excellency of God would manifest in you
+            </p>
           </div>
 
           <p className="mx-auto mt-5 flex items-center justify-center gap-1.5 px-4 text-center text-xs text-muted-foreground">
