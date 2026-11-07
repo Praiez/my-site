@@ -43,7 +43,7 @@ function QrPage() {
 
         <div className="mx-auto mt-6 flex w-fit items-center justify-center rounded-3xl border border-border/70 bg-white p-4">
           {formUrl ? (
-            <QRCodeSVG value={formUrl} size={208} level="M" fgColor="#4a2c34" bgColor="#ffffff" />
+            <QRCodeSVG value={formUrl} size={208} level="M" fgColor="#1e3a8a" bgColor="#ffffff" />
           ) : (
             <div className="h-52 w-52 animate-pulse rounded-2xl bg-muted" />
           )}

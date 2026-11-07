@@ -4,31 +4,31 @@
 
 @layer base {
   :root {
-    /* Warm, welcoming church palette: ivory paper, dusty berry, soft sage. */
-    --background: 36 40% 97%;
-    --foreground: 22 22% 18%;
+    /* Church blue palette: soft white paper, deep navy text, royal blue accents. */
+    --background: 216 45% 98%;
+    --foreground: 224 50% 16%;
     --card: 0 0% 100%;
-    --card-foreground: 22 22% 18%;
+    --card-foreground: 224 50% 16%;
     --popover: 0 0% 100%;
-    --popover-foreground: 22 22% 18%;
-    --primary: 346 34% 44%;
-    --primary-foreground: 36 45% 98%;
-    --secondary: 148 22% 92%;
-    --secondary-foreground: 154 22% 25%;
-    --muted: 34 28% 94%;
-    --muted-foreground: 25 12% 44%;
-    --accent: 42 60% 90%;
-    --accent-foreground: 28 35% 25%;
-    --destructive: 0 65% 52%;
+    --popover-foreground: 224 50% 16%;
+    --primary: 224 76% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 60% 95%;
+    --secondary-foreground: 224 55% 28%;
+    --muted: 214 40% 95%;
+    --muted-foreground: 221 14% 40%;
+    --accent: 214 75% 93%;
+    --accent-foreground: 224 62% 30%;
+    --destructive: 0 70% 48%;
     --destructive-foreground: 0 0% 100%;
-    --border: 32 24% 89%;
-    --input: 32 24% 87%;
-    --ring: 346 34% 44%;
-    --chart-1: 346 44% 62%;
-    --chart-2: 152 26% 52%;
-    --chart-3: 38 62% 62%;
-    --chart-4: 22 40% 46%;
-    --chart-5: 280 22% 60%;
+    --border: 214 30% 89%;
+    --input: 214 28% 85%;
+    --ring: 224 76% 48%;
+    --chart-1: 224 76% 48%;
+    --chart-2: 199 80% 44%;
+    --chart-3: 160 50% 38%;
+    --chart-4: 38 85% 52%;
+    --chart-5: 262 55% 55%;
     --radius: 1rem;
     --font-heading: "Fraunces", Georgia, "Times New Roman", serif;
     --font-body: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
@@ -74,12 +74,12 @@
 @layer utilities {
   .paper-glow {
     background-image:
-      radial-gradient(ellipse 80% 60% at 50% -10%, hsl(346 40% 92% / 0.75), transparent 70%),
-      radial-gradient(ellipse 60% 50% at 100% 100%, hsl(148 24% 90% / 0.7), transparent 70%);
+      radial-gradient(ellipse 80% 60% at 50% -10%, hsl(221 85% 93% / 0.8), transparent 70%),
+      radial-gradient(ellipse 60% 50% at 100% 100%, hsl(199 80% 92% / 0.7), transparent 70%);
   }
 
   .card-soft {
-    @apply rounded-[1.75rem] border border-border/70 bg-card shadow-[0_18px_50px_-28px_rgba(70,40,45,0.35)];
+    @apply rounded-[1.75rem] border border-border/70 bg-card shadow-[0_18px_50px_-28px_rgba(30,58,138,0.35)];
   }
 }
 

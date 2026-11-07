@@ -27,7 +27,7 @@ function WelcomePage() {
     <div className="paper-glow min-h-screen px-4 py-8 sm:py-14">
       <div className="mx-auto w-full max-w-xl animate-in fade-in slide-in-from-bottom-2 duration-500">
         <div className="no-print mb-6 flex flex-col items-center text-center">
-          <ChurchMark className="h-14 w-14" />
+          <ChurchMark className="h-20 w-20" />
           <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.22em] text-primary/80">Dominion Youth Centre</p>
           <p className="mt-1 max-w-xs text-sm italic text-muted-foreground">
             a community of love, a place of restoration and empowerment
